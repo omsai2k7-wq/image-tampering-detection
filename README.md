@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TRACE — Every Edit Leaves a Trace
 
 > **Cinematic, private, and accessible digital image forensics for everyone.**
@@ -160,3 +161,6 @@ TRACE was built by:
 - **P. Harshini Reddy** (HR)
 - **P. Omsai Reddy** (OR)
 - **Pavan Tej R** (PT)
+=======
+# image-tampering-detection
+>>>>>>> 10bbfa9d4e128807458fe203ee7fdaa8c4f882d4
