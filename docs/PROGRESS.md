@@ -97,18 +97,27 @@ A comprehensive repository audit was executed across the codebase. All core stag
 - [x] **DONE**: Evaluation harness (`scripts/eval/run-eval.ts`) and technical report in `docs/FORENSICS_NOTES.md`.
 
 ---
+## 3. Audit Verification Findings & Status
 
-## 3. Base Issues Identified for Step 2
+All requested key areas were inspected, executed, and confirmed:
+- **Loading Screen**: **DONE** (`components/intro/LoadingScreen.tsx`, `GlitchWordmark.tsx`) — real asset progress, iris circle exit, HUD telemetry, session persistence.
+- **Landing Page**: **DONE** (`components/landing/Hero.tsx`, `ProblemSection.tsx`, `HowItWorks.tsx`) — word mask reveal, interactive face glitching, stacking cards, timeline connection animation.
+- **Upload / Processing / Results**: **DONE** (`components/analyze/AnalyzeZone.tsx`, `Dropzone.tsx`, `ProcessingStage.tsx`, `ResultPanel.tsx`) — state machine, 3.5s minimum scan duration, radial meter, helpline guidance.
+- **Forensic Heatmap + Face Analysis + Fusion**: **DONE** (`lib/forensics/pipeline.ts`, `fusion.ts`, `faceforensics.ts`, `ForensicsPanel.tsx`) — ELA, noise residual, sharpness, JPEG ghost, 2D FFT, MediaPipe 478 landmarks, dual hysteresis thresholding.
+- **/api/analyze with Mock Provider**: **DONE** (`app/api/analyze/route.ts`, `lib/detection/providers/mock.ts`) — in-memory rate limiting, magic byte verification, deterministic hash score calculation.
+- **ADRIA (Text, Voice, 8 Languages)**: **DONE** (`components/adria/AdriaPanel.tsx`, `VoiceButton.tsx`, `lib/adria/languages.ts`, `app/api/adria/route.ts`) — streaming responses, Web Speech STT/TTS, 8 Indian languages (en, hi, te, kn, ta, ml, bn, mr).
+- **About Section**: **DONE** (`components/about/AboutSection.tsx`) — verified team card with "Pavan Tej R" (monogram "PT") and 3D card tilt.
+- **Persistent Shader Background**: **DONE** (`components/shared/ShaderBackground.tsx`, `components/ui/atc-shader.tsx`) — single WebGL2 canvas preserved across all stages and route transitions.
+- **Palatino Font**: **DONE** (`app/globals.css`, `app/layout.tsx`) — system font stack applied to `--font-sans`, `--font-display`, `--font-mono`.
+- **Border Beam**: **DONE** (`components/shared/BorderBeam.tsx`) — CSS `offset-path: rect()`, conic fallback, 3D tilt, staggered delays.
+- **CopyGuard**: **DONE** (`components/shared/CopyGuard.tsx`, `app/globals.css`) — global `user-select: none`, drag prevention, and explicit exceptions for inputs/textareas.
 
-1. **ESLint Ignore Configuration (`eslint.config.mjs`):**  
-   `public/**` is not ignored in ESLint flat config. This causes ESLint to parse the self-hosted MediaPipe WASM and bundled JavaScript files (`public/mediapipe/wasm/*`), generating 700+ warnings and false errors.
-2. **TypeScript / Lint Types:**
-   - `scripts/eval/run-eval.ts` line 34: `any` type on image property.
-   - `lib/forensics/faceforensics.ts` line 21: `any` type on `faceLandmarkerInstance`.
-   - `lib/forensics/fusion.ts` line 93: `let fused` should be `const fused`.
-   - `app/dev/forensics-lab/page.tsx` line 67: calling `setState` directly inside `useEffect`.
-   - Unused import warnings in `ForensicsPanel.tsx`, `RegionList.tsx`, `BorderBeam.tsx`, `ela.ts`.
-3. **Agent Rule Files Character Limit:**
-   - `.agents/rules/CHANGE_REQUEST_COMBINED.md` is 12,203 characters (exceeds 12,000 max).
-   - `.agents/rules/experience-stages.md` is 12,030 characters (exceeds 12,000 max).
-   - Need to split these at heading boundaries into `-a` and `-b` files to strictly adhere to AGY rule file limits.
+### Verification Matrix
+- `npm install`: **PASS** (dependencies cleanly resolved with `@types/node` ^22)
+- `npm run build`: **PASS** (Zero Next.js compilation or bundle errors)
+- `npm run lint`: **PASS** (ESLint zero errors, zero warnings)
+- `npm test`: **PASS** (4/4 Vitest unit tests passing)
+- `npm run eval`: **PASS** (Real measured metrics updated in `docs/FORENSICS_NOTES.md`)
+- Name check (`grep -ri "pavan tej"`): **PASS** (Zero instances without trailing " R")
+- Secrets check: **PASS** (Zero API keys or server tokens in client components)
+- Reduced motion: **PASS** (Respected across all CSS animations, shaders, Lenis, and hooks)

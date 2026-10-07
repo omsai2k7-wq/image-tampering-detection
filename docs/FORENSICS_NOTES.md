@@ -100,22 +100,22 @@ The evaluation harness (`scripts/eval/run-eval.ts`) was executed across 30 synth
 ### Measured Metrics Summary
 | Metric | Measured Value | Target Reference |
 | :--- | :--- | :--- |
-| **Mean IoU (Jaccard Index)** | **49.19%** | $\ge 20\%$ overlap |
-| **Mean Precision** | **56.45%** | Robust region bounds |
-| **Mean Recall** | **90.37%** | High sensitivity |
+| **Mean IoU (Jaccard Index)** | **48.76%** | $\ge 20\%$ overlap |
+| **Mean Precision** | **55.79%** | Robust region bounds |
+| **Mean Recall** | **91.70%** | High sensitivity |
 | **Untouched False Positive Rate (FPR)** | **0.0%** | Zero false alarms |
 
 ### Breakdown by Tamper Modality
 - **Splice Tampering**:
-  - *Mean IoU*: 30.64%
-  - *Recall*: 71.61%
+  - *Mean IoU*: 32.41%
+  - *Recall*: 75.97%
   - *Notes*: Noise variance and quantization step shifts reliably trigger ELA and Noise residual cues. Subtle boundaries are captured when difference exceeds background MAD.
 - **Blur Tampering**:
-  - *Mean IoU*: 57.34%
-  - *Recall*: 99.49%
+  - *Mean IoU*: 55.82%
+  - *Recall*: 99.14%
   - *Notes*: Sharpness variance drops precipitously in blurred regions, causing high z-score divergence against untouched background.
 - **Resize / Resampling Tampering**:
-  - *Mean IoU*: 59.59%
+  - *Mean IoU*: 58.06%
   - *Recall*: 100.00%
   - *Notes*: Resampling artifacts create high consistency disruption in noise residual blocks.
 
