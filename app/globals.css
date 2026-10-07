@@ -1,26 +1,249 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-palatino: "Palatino", "Palatino Linotype", "Book Antiqua", "URW Palladio L", "P052", "Palladio", Georgia, serif;
+  --font-sans: var(--font-palatino);
+  --font-display: var(--font-palatino);
+  --font-mono: var(--font-palatino);
+
+  --bg: #05060A;
+  --bg-elev: #0B0D14;
+  --surface: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.10);
+  --text: #E9ECF5;
+  --text-dim: #8B93A7;
+  --cyan: #00E5FF;
+  --violet: #8B5CF6;
+  --amber: #FFB020;
+  --red: #FF2E4D;
+  --green: #2CFFA7;
+
+  --background: #05060A;
+  --foreground: #E9ECF5;
+  --radius: 1.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-bg: #05060A;
+  --color-bg-elev: #0B0D14;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-border-subtle: rgba(255, 255, 255, 0.10);
+  --color-text: #E9ECF5;
+  --color-text-dim: #8B93A7;
+  --color-cyan: #00E5FF;
+  --color-violet: #8B5CF6;
+  --color-amber: #FFB020;
+  --color-red: #FF2E4D;
+  --color-green: #2CFFA7;
+  --font-sans: var(--font-palatino);
+  --font-display: var(--font-palatino);
+  --font-mono: var(--font-palatino);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+/* Global non-copyable text protection (casual deterrence) */
+html,
+body,
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+::selection {
+  background: transparent;
+}
+
+/* Editable exceptions */
+input,
+textarea,
+[contenteditable="true"],
+[contenteditable=""],
+.selectable {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Image & canvas dragging prevention */
+img,
+canvas {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+html {
+  background-color: var(--bg);
+  color: var(--text);
+  color-scheme: dark;
+  font-family: var(--font-palatino);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: transparent;
+  color: var(--text);
+  font-family: var(--font-palatino);
+  font-size: 17.5px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Headlines typography retuning for serif face */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-palatino);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+/* Small uppercase labels and HUD text */
+.hud-label,
+.font-mono {
+  font-family: var(--font-palatino) !important;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glass card styling */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 1.5rem;
+}
+
+/* 3D Border Beam Effect */
+.border-beam-core,
+.border-beam-glow {
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes border-beam-anim {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.border-beam-runner {
+  position: absolute;
+  aspect-ratio: 1;
+  width: var(--beam-size, 120px);
+  offset-path: rect(0 auto auto 0 round var(--beam-radius, inherit));
+  offset-anchor: 100% 50%;
+  animation: border-beam-anim var(--beam-duration, 7s) linear infinite;
+  animation-delay: var(--beam-delay, 0s);
+  animation-direction: var(--beam-direction, normal);
+  background: linear-gradient(
+    to left,
+    var(--beam-to, #00E5FF) 0%,
+    var(--beam-from, #BFF6FF) 30%,
+    transparent 100%
+  );
+}
+
+/* Fallback for browsers without offset-path: rect() support */
+@supports not (offset-path: rect(0 auto auto 0 round 10px)) {
+  .border-beam-runner {
+    display: none;
+  }
+  .border-beam-core,
+  .border-beam-glow {
+    background: conic-gradient(
+      from var(--angle),
+      transparent 0deg,
+      transparent 320deg,
+      var(--beam-from, #BFF6FF) 345deg,
+      var(--beam-to, #00E5FF) 360deg
+    );
+    animation: spin-angle var(--beam-duration, 7s) linear infinite;
+    animation-delay: var(--beam-delay, 0s);
+    animation-direction: var(--beam-direction, normal);
+  }
+}
+
+/* Conic border rotation */
+@keyframes spin-angle {
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* Scanlines overlay */
+.scanlines-overlay {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 255, 255, 0.025) 2px,
+    rgba(255, 255, 255, 0.025) 4px
+  );
+  pointer-events: none;
+}
+
+/* Stepped animated grain overlay */
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -3%); }
+  20% { transform: translate(2%, 3%); }
+  30% { transform: translate(-3%, 2%); }
+  40% { transform: translate(3%, -2%); }
+  50% { transform: translate(-2%, 1%); }
+  60% { transform: translate(2%, -1%); }
+  70% { transform: translate(-1%, -3%); }
+  80% { transform: translate(3%, 1%); }
+  90% { transform: translate(-2%, 2%); }
+}
+
+.film-grain {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  animation: grain-shift 8s steps(10) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-grain {
+    animation: none;
+  }
+  .border-beam-core,
+  .border-beam-glow,
+  .border-beam-runner {
+    animation: none !important;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #05060A;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.4);
 }

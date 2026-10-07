@@ -1,69 +1,109 @@
-import Image from "next/image";
+"use client"
+
+import { useState, useEffect } from "react"
+import LoadingScreen from "@/components/intro/LoadingScreen"
+import CustomCursor from "@/components/shared/CustomCursor"
+import Navbar from "@/components/shared/Navbar"
+import Hero from "@/components/landing/Hero"
+import ProblemSection from "@/components/landing/ProblemSection"
+import HowItWorks from "@/components/landing/HowItWorks"
+import AnalyzeZone from "@/components/analyze/AnalyzeZone"
+import AboutSection from "@/components/about/AboutSection"
+import Footer from "@/components/shared/Footer"
+import AdriaLauncher from "@/components/adria/AdriaLauncher"
+import AdriaPanel from "@/components/adria/AdriaPanel"
+import { useBackgroundState } from "@/lib/context/BackgroundContext"
 
 export default function Home() {
+  const [loadingComplete, setLoadingComplete] = useState<boolean>(false)
+  const [adriaOpen, setAdriaOpen] = useState<boolean>(false)
+  const [adriaSummary, setAdriaSummary] = useState<string | null>(null)
+  const { setIsAdriaOpen } = useBackgroundState()
+
+  // Sync ADRIA focus state with background dimming
+  useEffect(() => {
+    setIsAdriaOpen(adriaOpen)
+  }, [adriaOpen, setIsAdriaOpen])
+
+  // Session storage intro checking
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const forceIntro = urlParams.get("intro") === "1"
+    const hasSeenIntro = sessionStorage.getItem("trace_intro_seen")
+
+    if (hasSeenIntro && !forceIntro) {
+      const timer = setTimeout(() => {
+        setLoadingComplete(true)
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const handleLoadingFinished = () => {
+    sessionStorage.setItem("trace_intro_seen", "true")
+    setLoadingComplete(true)
+  }
+
+  const handleAskAdria = (summary: string) => {
+    setAdriaSummary(summary)
+    setAdriaOpen(true)
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      {/* Skip to Content for Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#00E5FF] focus:text-black focus:font-semibold focus:rounded-lg"
+      >
+        Skip to main content
+      </a>
+
+      {/* Signature Loading Screen */}
+      {!loadingComplete && (
+        <LoadingScreen onComplete={handleLoadingFinished} />
+      )}
+
+      {/* Custom Precision Cursor */}
+      <CustomCursor />
+
+      {/* Global Nav Bar */}
+      <Navbar visible={loadingComplete} />
+
+      {/* Main Content Flow */}
+      <main
+        id="main-content"
+        className={`relative z-10 flex flex-col w-full transition-opacity duration-700 ${
+          !loadingComplete ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
+        <Hero />
+        <ProblemSection />
+        <HowItWorks />
+        <AnalyzeZone onAskAdria={handleAskAdria} />
+        <AboutSection />
       </main>
-    </div>
-  );
+
+      {/* Global Footer */}
+      <Footer />
+
+      {/* ADRIA AI Assistant (Orb Launcher + Chat Panel) */}
+      {loadingComplete && (
+        <>
+          <AdriaLauncher
+            isOpen={adriaOpen}
+            onToggle={() => setAdriaOpen(true)}
+          />
+          <AdriaPanel
+            isOpen={adriaOpen}
+            onClose={() => {
+              setAdriaOpen(false)
+              setAdriaSummary(null)
+            }}
+            initialSummary={adriaSummary}
+          />
+        </>
+      )}
+    </>
+  )
 }
