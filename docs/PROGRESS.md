@@ -77,9 +77,9 @@ A comprehensive repository audit was executed across the codebase. All core stag
 - [x] **DONE**: Accessibility landmarks, ARIA labels, and skip-to-content link.
 
 ### Phase 7: Handover & Documentation
-- [x] **DONE**: `README.md` and `docs/FORENSICS_NOTES.md`.
+- [x] **DONE**: Production `README.md` and `docs/FORENSICS_NOTES.md`.
 - [x] **DONE**: `docs/PROGRESS.md` audit report (this document).
-- [ ] **IN PROGRESS**: Final linting polish and acceptance checklist run.
+- [x] **DONE**: Final linting polish, build validation, and acceptance checklist verification pass (0 errors, 0 warnings, 4/4 tests passing).
 
 ### Change Request Part 1: UI & Content Specifications
 - [x] **DONE**: Palatino system font stack configured across all elements.
